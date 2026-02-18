@@ -3,42 +3,49 @@
         "_id": "1",
         "name":"Banana",
         "description": "Yellow curved delicious fruit",
-        "price": ".50",
+        "price": 0.50,
         "quantity": 100
     },
     {
         "_id": "2",
         "name":"Apple",
         "description": "Red tasty round fruit",
-        "price": ".40",
+        "price": 0.40,
         "quantity": 200
     },
     {
         "_id": "3",
         "name":"Cheese",
         "description": "Yellow moldy dairy product",
-        "price": "1.00",
+        "price": 1.00,
         "quantity": 50
     },
     {
         "_id": "4",
         "name":"Whole Milk",
         "description": "1 Gallon of Whole Milk",
-        "price": "3.00",
+        "price": 3.00,
         "quantity": 150
     },
     {
         "_id": "5",
         "name":"Wheat Bread",
         "description": "1 Loaf of Wheat Bread",
-        "price": "1.99",
+        "price": 1.99,
         "quantity": 180
     },
     {
         "_id": "6",
         "name":"White Bread",
         "description": "1 Loaf of White Bread",
-        "price": "1.99",
+        "price": 1.99,
         "quantity": 180
+    },
+    {
+        "_id": "7",
+        "name":"Skim Milk",
+        "description": "1 Gallon of Skim Milk",
+        "price": 3.00,
+        "quantity": 190
     }
 ]

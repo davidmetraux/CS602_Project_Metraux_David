@@ -6,10 +6,14 @@ const quantitySchema = new Schema({
   quantity: Number,
   product: {
       type: String,
-      rf: 'Product'
-  }
+      ref: 'Product'
+  },
+  orders: [{
+    type: String,
+    ref: "Order"
+  }]
 }, 
-{collection : 'quantity'});
+{collection : 'quantities'});
 
 export const Quantity = mongoose.model(
   'Quantity', quantitySchema);
