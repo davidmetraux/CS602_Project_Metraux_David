@@ -4,11 +4,7 @@ const Schema = mongoose.Schema;
 
 const customerSchema = new Schema({
   _id: String,
-  Name: String,
-  coordinator: {
-      type: String,
-      ref: 'Coordinator'
-  }
+  name: String,
 }, 
 {collection : 'courses'});
 
