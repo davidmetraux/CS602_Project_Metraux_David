@@ -10,7 +10,8 @@ const orderSchema = new Schema({
   customer: {
     type: String,
     ref: 'Customer'
-  }
+  },
+  inCart: Boolean
 }, 
 {collection : 'orders'});
 

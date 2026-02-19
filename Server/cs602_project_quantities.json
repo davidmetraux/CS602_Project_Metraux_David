@@ -2,16 +2,19 @@
     {
         "_id": "1",
         "quantity":"2",
-        "product": "1"
+        "product": "1",
+        "orders": ["1"]
     },
     {
         "_id": "2",
         "quantity":"4",
-        "product": "2"
+        "product": "2",
+        "orders": ["1"]
     },
     {
         "_id": "3",
         "quantity":"5",
-        "product": "4"
+        "product": "4",
+        "orders": ["1"]
     }
 ]

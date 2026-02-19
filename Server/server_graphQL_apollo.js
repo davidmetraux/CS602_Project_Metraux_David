@@ -38,6 +38,7 @@ const typeDefs_Queries = `#graphql
     _id: String!,
     quantities: [Quantity]!
     customer: Customer!
+    inCart: Boolean!
   }
 
 
@@ -49,6 +50,24 @@ const typeDefs_Queries = `#graphql
     lookupByProductName(name: String!): [Product]!
     allProducts: [Product]!
     productsWithinRange(startInclusive: Float, endInclusive: Float): [Product]!
+  }
+`
+
+const typeDefs_Mutations = `#graphql
+  type Mutation {
+    moveToCart(cartData: moveToCartInput!): Order
+    submitOrder(cartData: submitOrderInput!): Order
+  }
+
+ input moveToCartInput {
+    productId: String!
+    customerId: String!
+    quantity: Int!
+  }
+
+
+  input submitOrderInput {
+    customerId: String!
   }
 `
 
@@ -139,9 +158,44 @@ const resolvers_Queries = {
 
 };
 
+const resolvers_Mutations = {
+
+  Mutation: {
+
+    moveToCart: async (parent, args, context) => {
+      console.log("Move item to cart", args);
+      const { cartData } = args;
+      
+      const result = await storeDB.moveToCart(
+        cartData.productId, cartData.customerId, cartData.quantity);
+
+      return result;
+    },
+
+    // removeFromCart: async (parent, args, context) => {
+    //   console.log("Remove item from cart", args);
+    //   const { cartData } = args;
+
+    //   const result = await storeDB.removeFromCart(
+    //     cartData.customerId, cartData.product);
+
+    // },
+
+    submitOrder: async (parent, args, context) => {
+      console.log("Submit order", args);
+      const { cartData } = args;
+      
+      const result = await storeDB.submitOrder(
+        cartData.customerId);
+
+      return result
+    }
+  }
+};
+
 const server = new ApolloServer(
-  {typeDefs: [typeDefs_Queries], 
-   resolvers: [resolvers_Queries]});
+  {typeDefs: [typeDefs_Queries, typeDefs_Mutations], 
+   resolvers: [resolvers_Queries, resolvers_Mutations]});
 
 
 const { url } = await startStandaloneServer(server, {
