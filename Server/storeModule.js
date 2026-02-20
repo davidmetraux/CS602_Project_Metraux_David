@@ -80,6 +80,9 @@ export const productsWithinRange =  async (startInclusive, endInclusive) => {
 //mutations
 
 export const moveToCart = async (productId, customerId, quantity) => {
+	//PUT IN ERROR MESSAGING IF EITHER ID IS WORNG
+
+
 	let customer = await Customer.findById(customerId).populate({
 			path: 'orders',
 			match: { inCart: true },
@@ -88,14 +91,12 @@ export const moveToCart = async (productId, customerId, quantity) => {
 			}
 		}
 	)
-	// let product = await Customer.findById(productId)
 	let cart = customer.orders[0]
 
 	console.log("cart", cart)
 
 	let existingQuantity = cart.quantities.find((quantity)=>quantity.product==productId)
 	if (existingQuantity){
-
 
 		existingQuantity.quantity+=quantity
 		await existingQuantity.save()
@@ -113,21 +114,58 @@ export const moveToCart = async (productId, customerId, quantity) => {
 		await cart.save()
 
 	}
-	
 
 	return cart
 }
 
 
 export const removeFromCart = async (customerId, productId) => {
+
+	//PUT IN ERROR MESSAGING IF EITHER ID IS WORNG
+	let customer = await Customer.findById(customerId).populate({
+			path: 'orders',
+			match: { inCart: true },
+			populate: {
+				path: 'quantities',
+			}
+		}
+	)
+
+	let cart = customer.orders[0]
+
+	console.log("cart", cart)
+
+	let quantity = cart.quantities.find((quantity)=>quantity.product==productId)
+
+	console.log("quantity to remove", quantity)
+
+
+	let index = cart.quantities.indexOf(quantity)
+	cart.quantities.splice(index, 1)
+	
+	console.log("cart after splicing", cart)
+
+	await cart.save()
+
+	await Quantity.deleteOne({_id: quantity._id})
+
+	return cart
 }
 
 export const submitOrder = async (customerId) => {
+	//REMOVE FROM INVENTORY AND DON'T ALLOW IT IF IT CAN'T BE
+
 //maybe remove customecart and just find the item
 	let customer = await Customer.findById(customerId).populate("orders");
 	let customerCart = await Customer.findById(customerId).populate({
 			path: 'orders',
 			match: { inCart: true },
+			populate: {
+				path: 'quantities',
+				populate: {
+					path:'product'
+				}
+			}
 		}
 	)
 	customerCart = customerCart.orders[0]
@@ -148,8 +186,6 @@ export const submitOrder = async (customerId) => {
 	await customer.save()
 
 	return newCart
-
-
 }
 
 

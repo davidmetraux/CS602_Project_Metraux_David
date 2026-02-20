@@ -56,6 +56,7 @@ const typeDefs_Queries = `#graphql
 const typeDefs_Mutations = `#graphql
   type Mutation {
     moveToCart(cartData: moveToCartInput!): Order
+    removeFromCart(cartData: removeFromCartInput!): Order
     submitOrder(cartData: submitOrderInput!): Order
   }
 
@@ -64,6 +65,12 @@ const typeDefs_Mutations = `#graphql
     customerId: String!
     quantity: Int!
   }
+
+  input removeFromCartInput {
+    customerId: String!
+    productId: String!
+  }
+
 
 
   input submitOrderInput {
@@ -172,14 +179,14 @@ const resolvers_Mutations = {
       return result;
     },
 
-    // removeFromCart: async (parent, args, context) => {
-    //   console.log("Remove item from cart", args);
-    //   const { cartData } = args;
+    removeFromCart: async (parent, args, context) => {
+      console.log("Remove item from cart", args);
+      const { cartData } = args;
 
-    //   const result = await storeDB.removeFromCart(
-    //     cartData.customerId, cartData.product);
+      const result = await storeDB.removeFromCart(
+        cartData.customerId, cartData.productId);
 
-    // },
+    },
 
     submitOrder: async (parent, args, context) => {
       console.log("Submit order", args);
