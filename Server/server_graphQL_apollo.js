@@ -30,7 +30,7 @@ const typeDefs_Queries = `#graphql
     _id: String!,
     quantity: Int!,
     product: Product!
-    orders: [Order]!
+    order: Order!
   }
 
 
@@ -141,10 +141,10 @@ const resolvers_Queries = {
   },
 
   Quantity: {
-    orders: async (parent, args, context) => {
+    order: async (parent, args, context) => {
       console.log(" (2) Parent quantity id", parent._id, "Args", args);
-      const result = await parent.populate("orders");
-      return result.orders;
+      const result = await parent.populate("order");
+      return result.order;
     },
 
     product: async (parent, args, context) => {

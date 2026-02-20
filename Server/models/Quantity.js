@@ -8,10 +8,10 @@ const quantitySchema = new Schema({
       type: String,
       ref: 'Product'
   },
-  orders: [{
+  order: {
     type: String,
     ref: "Order"
-  }]
+  }
 }, 
 {collection : 'quantities'});
 
