@@ -9,7 +9,7 @@ import { Customer, Product, Order, Quantity } from './models/index.js';
 import * as storeDB
     from './storeModule.js';
 
-const typeDefs_Queries = `#graphql
+export const typeDefs_Queries = `#graphql
   type Product {
     _id: String!
     name: String!,
@@ -53,7 +53,7 @@ const typeDefs_Queries = `#graphql
   }
 `
 
-const typeDefs_Mutations = `#graphql
+export const typeDefs_Mutations = `#graphql
   type Mutation {
     moveToCart(cartData: moveToCartInput!): Order
     removeFromCart(cartData: removeFromCartInput!): Order
@@ -78,7 +78,7 @@ const typeDefs_Mutations = `#graphql
   }
 `
 
-const resolvers_Queries = {
+export const resolvers_Queries = {
 
   Query: {
     lookupByCustomerId: async (parent, args, context) => {
@@ -165,7 +165,7 @@ const resolvers_Queries = {
 
 };
 
-const resolvers_Mutations = {
+export const resolvers_Mutations = {
 
   Mutation: {
 
@@ -211,3 +211,21 @@ const { url } = await startStandaloneServer(server, {
 
 console.log(`🚀  Server ready at: ${url}`);
 
+// import express, { json } from 'express';
+
+// const app = express();
+
+
+// // to parse request body
+// app.use(express.urlencoded({extended: false}));
+// app.use(express.json());
+
+// // for pretty print JSON response
+// app.set('json spaces', 2);
+
+// // setup handlebars view engine
+// import { engine } from 'express-handlebars';
+// app.engine('handlebars', engine({defaultLayout: ''}));
+
+// app.set('view engine', 'handlebars');
+// app.set('views', './views');
