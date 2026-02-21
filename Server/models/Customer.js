@@ -5,6 +5,9 @@ const Schema = mongoose.Schema;
 const customerSchema = new Schema({
   _id: String,
   name: String,
+  role: String,
+  password: String,
+  username: String,
   orders: [{
     type: String,
     ref: "Order"

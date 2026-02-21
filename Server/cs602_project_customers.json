@@ -2,14 +2,25 @@
     {
         "_id": "1",
         "name":"Abby",
+        "username": "alice",
+        "password": "1234",
+        "role":"user",
         "orders": ["1"]
     },
     {
         "_id":"2",
-        "name": "Barry"
+        "name": "Barry",
+        "username": "barry",        
+        "password": "2345",
+        "role":"user",
+        "orders": [] 
     },
     {
         "_id":"3",
-        "name": "Charlene"
+        "name": "Charlene",
+        "username": "charlene",        
+        "password": "3456",
+        "role":"admin",
+        "orders": [] 
     }
 ]
