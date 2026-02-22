@@ -184,10 +184,25 @@ app.post('/cart',
     //let's say we're abby for now
     // let customerId=req.body.customerId
     let customerId="1"
-    let productId=req.body.productId
 
-    await storeDB.removeFromCart(customerId, productId)
+    if (req.body.productId){
+      let productId=req.body.productId
+      await storeDB.removeFromCart(customerId, productId)
+    } 
+    if (req.body.submitOrder){
+      await storeDB.submitOrder(customerId)
+
+    }
+    
     res.redirect('/cart');
+});
+
+app.get('/pastOrders',
+  async (req, res) => {
+    const result = await storeDB.getPastOrders("1")
+    
+    res.render('pastOrders', 
+    {orders: result});
 });
 
 //api
@@ -198,7 +213,7 @@ app.get('/api/lookupByProductName/:pname',
     res.json(result);
 });
 
-app.get('/api/productsWithinRange/:start/:end',
+app.get('/api/productsWithinRange/:start/:end', 
   async (req, res) => {
     const result = await storeDB.productsWithinRange(req.params.start, req.params.end)
     res.json(result);

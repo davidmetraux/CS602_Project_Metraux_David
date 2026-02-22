@@ -89,6 +89,25 @@ export const getCart =  async (customerId) => {
 				path: "product"
 			}
 		})
+	console.log(result)
+
+	return result
+}
+
+
+//maybe add to graphql, but might not like the lean bit. Kind of annoying.
+export const getPastOrders =  async (customerId) => {
+	console.log("cart of user with id "+ customerId)
+
+	let result =  await Order.find({
+			customer:customerId,
+			inCart:false
+		}).populate({
+			path: 'quantities',
+			populate: {
+				path: "product"
+			}
+		}).lean(true)
 
 	return result
 }

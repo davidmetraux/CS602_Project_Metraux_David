@@ -1,16 +1,18 @@
 <b>Past Orders</b>
 
-<ul>{{#each order}}
+<ul>{{#each orders}}
     <li>
         Order: {{this._id}}
         <ul>
-        {{#each quantity}}
-            <li>{{this.product.name}} - {{this.product.description}} - {{this.quantity}}<button>Remove From Cart</button></li>
+        {{#each quantities}}
+            <li>{{this.product.name}} - {{this.product.description}} - {{this.quantity}}</li>
         {{else}}
-            No results
+            No products
         {{/each}}
 
         </ul>
     </li>
+    {{else}}
+            No past orders
     {{/each}}
 </ul>
