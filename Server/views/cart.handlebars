@@ -1,10 +1,11 @@
 <b>Cart</b>
 
-
+<form method="POST" action="/cart">
 <ul>
     {{#each quantities}}
-        <li>{{this.product.name}} - {{this.product.description}} - {{this.quantity}}<button>Remove From Cart</button></li>
+        <li>{{this.product.name}} - {{this.product.description}} - {{this.quantity}}<button type="submit" name="productId" value={{this.product._id}}>Remove From Cart</button></li>
     {{else}}
         No results
     {{/each}}
 </ul>
+</form>

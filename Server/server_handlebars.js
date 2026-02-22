@@ -178,6 +178,18 @@ app.get('/cart',
 		{quantities: result.quantities.map(quantity => quantity.toJSON())});
 });
 
+
+app.post('/cart',
+  async (req, res) => {
+    //let's say we're abby for now
+    // let customerId=req.body.customerId
+    let customerId="1"
+    let productId=req.body.productId
+
+    await storeDB.removeFromCart(customerId, productId)
+    res.redirect('/cart');
+});
+
 //api
 
 app.get('/api/lookupByProductName/:pname',
