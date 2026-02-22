@@ -171,11 +171,11 @@ app.get('/lookupByProductName/:pname',
 app.get('/cart',
   async (req, res) => {
     //let's say we're abby for now
-    const result = await storeDB.lookupByProductName(req.params.pname)
+    const result = await storeDB.getCart("1")
 
     console.log(result)
-    res.render('productSearch', 
-		{query: req.params.pname, products: result.map(product => product.toJSON())});
+    res.render('cart', 
+		{quantities: result.quantities.map(quantity => quantity.toJSON())});
 });
 
 //api

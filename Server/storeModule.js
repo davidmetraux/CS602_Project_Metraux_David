@@ -77,6 +77,22 @@ export const productsWithinRange =  async (startInclusive, endInclusive) => {
 	return result
 }
 
+export const getCart =  async (customerId) => {
+	console.log("cart of user with id "+ customerId)
+
+	let result =  await Order.findOne({
+			customer:customerId,
+			inCart:true
+		}).populate({
+			path: "quantities",
+			populate: {
+				path: "product"
+			}
+		})
+
+	return result
+}
+
 //mutations
 
 export const moveToCart = async (productId, customerId, quantity) => {

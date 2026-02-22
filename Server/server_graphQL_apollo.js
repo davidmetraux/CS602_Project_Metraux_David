@@ -50,6 +50,7 @@ export const typeDefs_Queries = `#graphql
     lookupByProductName(name: String!): [Product]!
     allProducts: [Product]!
     productsWithinRange(startInclusive: Float, endInclusive: Float): [Product]!
+    getCart(id: String!): Order
   }
 `
 
@@ -117,6 +118,12 @@ export const resolvers_Queries = {
     productsWithinRange: async (parent, args, context) => {
       console.log("products within $"+args.startInclusive+" and $"+args.endInclusive)
       const result = await storeDB.productsWithinRange(args.startInclusive, args.endInclusive)
+      return result
+    },
+
+    getCart: async (parent, args, context) => {
+      console.log("get cart", args.id)
+      const result = await storeDB.getCart(args.id)
       return result
     }
 
