@@ -63,7 +63,8 @@ app.set('json spaces', 2);
 
 // setup handlebars view engine
 import { engine } from 'express-handlebars';
-app.engine('handlebars', engine({defaultLayout: ''}));
+app.engine('handlebars', 
+		engine({defaultLayout: 'main'}));
 
 app.set('view engine', 'handlebars');
 app.set('views', './views');
@@ -125,15 +126,69 @@ app.use("/graphql",
 ));
 
 
-app.get('/api/lookupByProjectName/:pname',
+//views
+
+app.get('/products', 
   async (req, res) => {
-    const result = await storeDB.lookupByProductName(req.param.pname)
+
+    const result = await storeDB.allProducts()
+    
+
+    res.render('allProducts', 
+		{products: result.map(product => product.toJSON())});
+  }
+);
+
+app.get('/lookupByProductName', 
+  async (req, res) => {
+	if (req.query.pname) {
+		const result = await storeDB.lookupByProductName(req.query.pname)
+		res.render('productSearch', 
+			{query: req.query.pname, products: result.map(product => product.toJSON())});
+	} else {
+		res.render('productSearchForm');
+	}
+});
+
+app.post('/lookupByProductName', 
+  async (req, res) => {
+	let result = await storeDB.lookupByProductName(req.body.pname);
+	res.render('productSearch', 
+		{query: req.body.pname, products: result.map(product => product.toJSON())});
+});
+
+
+app.get('/lookupByProductName/:pname',
+  async (req, res) => {
+    const result = await storeDB.lookupByProductName(req.params.pname)
+
+    console.log(result)
+    res.render('productSearch', 
+		{query: req.params.pname, products: result.map(product => product.toJSON())});
+});
+
+
+app.get('/cart',
+  async (req, res) => {
+    //let's say we're abby for now
+    const result = await storeDB.lookupByProductName(req.params.pname)
+
+    console.log(result)
+    res.render('productSearch', 
+		{query: req.params.pname, products: result.map(product => product.toJSON())});
+});
+
+//api
+
+app.get('/api/lookupByProductName/:pname',
+  async (req, res) => {
+    const result = await storeDB.lookupByProductName(req.params.pname)
     res.json(result);
 });
 
 app.get('/api/productsWithinRange/:start/:end',
   async (req, res) => {
-    const result = await storeDB.productsWithinRange(req.param.start, req.params.end)
+    const result = await storeDB.productsWithinRange(req.params.start, req.params.end)
     res.json(result);
 });
 

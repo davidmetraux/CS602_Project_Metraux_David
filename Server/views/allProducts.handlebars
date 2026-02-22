@@ -1,0 +1,10 @@
+<b>All Products </b>
+
+<ul>
+    {{#each products}}
+        <li>{{this.name}} - {{this.description}} - <input><button>Add to Cart</button></li>
+    {{else}}
+        No results
+    {{/each}}
+</ul>
+
