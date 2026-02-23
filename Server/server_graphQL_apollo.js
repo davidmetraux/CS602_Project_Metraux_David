@@ -218,21 +218,3 @@ const { url } = await startStandaloneServer(server, {
 
 console.log(`🚀  Server ready at: ${url}`);
 
-// import express, { json } from 'express';
-
-// const app = express();
-
-
-// // to parse request body
-// app.use(express.urlencoded({extended: false}));
-// app.use(express.json());
-
-// // for pretty print JSON response
-// app.set('json spaces', 2);
-
-// // setup handlebars view engine
-// import { engine } from 'express-handlebars';
-// app.engine('handlebars', engine({defaultLayout: ''}));
-
-// app.set('view engine', 'handlebars');
-// app.set('views', './views');
