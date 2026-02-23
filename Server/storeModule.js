@@ -202,7 +202,6 @@ export const removeFromCart = async (customerId, productId) => {
 }
 
 export const submitOrder = async (customerId) => {
-	//REMOVE FROM INVENTORY AND DON'T ALLOW IT IF IT CAN'T BE
 
 //maybe remove customecart and just find the item
 	let customer = await Customer.findById(customerId).populate("orders");
