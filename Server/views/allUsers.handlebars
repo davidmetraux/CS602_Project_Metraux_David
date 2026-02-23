@@ -1,0 +1,12 @@
+<b>All Customers </b>
+
+<form method="POST" action="/products">
+<ul>
+    {{#each customers}}
+        <li>{{this.name}} - {{this.username}}</li>
+    {{else}}
+        No results
+    {{/each}}
+</ul>
+</form>
+

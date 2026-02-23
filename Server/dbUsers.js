@@ -14,7 +14,7 @@ const users = [
         username: "barry",        
         password: "2345",
         role:"user",
-       orders: [] 
+       orders: ["2"] 
     },
     {
         _id:"3",
@@ -22,13 +22,13 @@ const users = [
         username: "charlene",        
         password: "3456",
         role:"admin",
-        orders: [] 
+        orders: ["3"] 
     }
 ]
 
-export function findUser (name) {
+export function findUser (username) {
   return users.find(user => 
-            user.username == name);
+            user.username == username);
 }
 
 export async function  validateUser(name, password) {

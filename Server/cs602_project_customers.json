@@ -13,7 +13,7 @@
         "username": "barry",        
         "password": "2345",
         "role":"user",
-        "orders": [] 
+        "orders": ["2"] 
     },
     {
         "_id":"3",
@@ -21,6 +21,6 @@
         "username": "charlene",        
         "password": "3456",
         "role":"admin",
-        "orders": [] 
+        "orders": ["3"] 
     }
 ]

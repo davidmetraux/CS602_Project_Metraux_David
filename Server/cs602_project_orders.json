@@ -4,5 +4,17 @@
         "quantities":["1","2","3"],
         "customer": "1",
         "inCart":true
+    },
+    {
+        "_id": "2",
+        "quantities":[],
+        "customer": "2",
+        "inCart":true
+    },
+    {
+        "_id": "3",
+        "quantities":[],
+        "customer": "3",
+        "inCart":true
     }
 ]

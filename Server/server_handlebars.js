@@ -5,7 +5,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { GraphQLError } from 'graphql';
 
-import { validateUser } from './dbUsers.js';
+import { validateUser, findUser } from './dbUsers.js';
 
 import * as storeDB 
     from './storeModule.js';
@@ -66,7 +66,7 @@ passport.serializeUser((user, cb) => {
   console.log("Serialize", user);
   cb(null, {
     id: user.id,
-    name: user.name,
+    username: user.username,
     role: user.role
   });
 });
@@ -184,7 +184,7 @@ app.get('/products', ensureAuthenticated,
 app.post('/products', ensureAuthenticated,
   async (req, res) => {
     //let's say we're abby for now
-    let customerId= req.user
+     let customerId =  findUser(req.user.username)._id
 
 
     let productId = req.body.productId
@@ -233,7 +233,7 @@ app.get('/lookupByProductName/:pname', ensureAuthenticated,
 app.get('/cart', ensureAuthenticated,
   async (req, res) => {
     //let's say we're abby for now
-    let customerId= req.user
+     let customerId =  findUser(req.user.username)._id
     const result = await storeDB.getCart(customerId)
 
     console.log(result)
@@ -244,8 +244,7 @@ app.get('/cart', ensureAuthenticated,
 
 app.post('/cart', ensureAuthenticated,
   async (req, res) => {
-    //let's say we're abby for now
-    let customerId= req.user
+     let customerId =  findUser(req.user.username)._id
 
     if (req.body.productId){
       let productId=req.body.productId
@@ -261,12 +260,29 @@ app.post('/cart', ensureAuthenticated,
 
 app.get('/pastOrders', ensureAuthenticated,
   async (req, res) => {
-    let customerId =  req.user
+    let customerId =  findUser(req.user.username)._id
     const result = await storeDB.getPastOrders(customerId)
-
     
     res.render('pastOrders', 
     {user: req.user, orders: result});
+});
+
+app.get('/logout', function(req, res, next){
+  req.logout(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/');
+  });
+});
+
+//admin
+app.get('/allUsers', ensureAuthenticated, ensureAuthorized("admin"),
+  async (req, res) => {
+    const result = await storeDB.getAllCustomers()
+    console.log(result)
+
+    
+    res.render('allUsers', 
+    {user: req.user, customers: result.map((customer)=>customer.toJSON())});
 });
 
 //api

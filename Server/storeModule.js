@@ -113,6 +113,15 @@ export const getPastOrders =  async (customerId) => {
 	return result
 }
 
+//maybe add to graphql
+export const getAllCustomers =  async () => {
+	console.log("\nall customers");
+
+	let result = await Customer.find({});
+
+	return result
+};
+
 //mutations
 
 export const moveToCart = async (productId, customerId, quantity) => {
