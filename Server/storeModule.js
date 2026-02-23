@@ -218,6 +218,25 @@ export const submitOrder = async (customerId) => {
 		}
 	)
 	customerCart = customerCart.orders[0]
+	const quantities = customerCart.quantities
+
+	let quantity;
+	let product;
+	for (let i=0; i<quantities.length; i++){
+		quantity = quantities[i]
+		console.log("the quantity", quantity)
+		product = await quantity.product
+		console.log("the product", product)
+		if (product.quantity > quantity.quantity)
+			product.quantity = product.quantity - quantity.quantity
+		else {
+			quantity.quantity = product.quantity
+			product.quantity = 0
+			console.log("product quanity should be 0", product)
+		}
+		quantity.save()
+		product.save()
+	}
 
 	customerCart.inCart=false
 	await customerCart.save()
