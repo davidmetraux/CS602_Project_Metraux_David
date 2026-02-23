@@ -8,8 +8,12 @@
 	{{!-- <img src="/images/bu-logo.gif" alt="logo"> --}}
 </header>
 <h3>CS602 Project - David Metraux</h3>
+{{#if user}}
 <a href="/products">All Products</a> | <a href="/lookupByProductName">Lookup By Product Name</a> | 
 <a href="/cart">Cart</a> | <a href="/pastOrders">Past Orders</a> | <a href="/random">Admin Only: Pick User</a>
+{{else}}
+<a href="/login">Log in</a> 
+{{/if}}
 <hr/>
 	
 	{{{body}}}

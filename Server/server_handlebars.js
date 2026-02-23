@@ -1,9 +1,11 @@
-// import passport from 'passport';
-// import {Strategy as LocalStrategy} from 'passport-local';
+import passport from 'passport';
+import {Strategy as LocalStrategy} from 'passport-local';
 
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { GraphQLError } from 'graphql';
+
+import { validateUser } from './dbUsers.js';
 
 import * as storeDB 
     from './storeModule.js';
@@ -16,10 +18,28 @@ import {typeDefs_Queries, typeDefs_Mutations,
     from "./server_graphQL_apollo.js";
 
 
-// const tokenSecret = 'cs602-secret';
-
 import express, { json } from 'express';
 import session from 'express-session';
+
+const tokenSecret = 'cs602-secret';
+
+passport.use(
+  new LocalStrategy(
+    function (username, password, cb) {
+      process.nextTick(async function () {
+        const user = await validateUser(username, password);
+        if (!user) { 
+          return cb(null, false, 
+            { message: 'Incorrect username or password.' }); 
+        }
+        else {
+          return cb(null, user);  
+        }
+  
+      });
+    }
+  )
+);
 
 const app = express();
 
@@ -37,25 +57,25 @@ app.use(
   })
 );
 
-// Initialize Passport and session
-// app.use(passport.initialize());
-// app.use(passport.session());
+//Initialize Passport and session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Serialize user information
-// passport.serializeUser((user, cb) => {
-//   console.log("Serialize", user);
-//   cb(null, {
-//     id: user.id,
-//     name: user.name,
-//     role: user.role
-//   });
-// });
+passport.serializeUser((user, cb) => {
+  console.log("Serialize", user);
+  cb(null, {
+    id: user.id,
+    name: user.name,
+    role: user.role
+  });
+});
 
 // Deserialize user information
-// passport.deserializeUser((obj, cb) => {
-//   console.log("DeSerialize", obj);
-//   cb(null, obj);
-// });
+passport.deserializeUser((obj, cb) => {
+  console.log("DeSerialize", obj);
+  cb(null, obj);
+});
 
 
 // for pretty print JSON response
@@ -73,21 +93,15 @@ app.set('views', './views');
 app.use(express.static('./public'));
 
 
-app.get('/', (req, res) => {
-    res.render('index');
-});
 
-app.get('/login', (req, res) => {
-    res.render('login');
-});
- 
 
 
 app.post('/login', 
-  // passport.authenticate('local', { failureRedirect: '/' }),
-  function(req, res) {
-    res.send({ token: 'Bearer Success'});
-  });
+  passport.authenticate('local', 
+    { successRedirect: "/",
+      failureRedirect: '/login', 
+      failureMessage: true })
+);
 
 
 
@@ -102,47 +116,75 @@ await server.start();
 
 
 
+//protected route middleware function
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}
+
 // protected route middleware function
-// function ensureAuthenticated(req, res, next) {
-//   if (req.isAuthenticated()) {
-//     return next();
-//   }
-//   res.redirect('/');
-// }
+const ensureAuthorized = (requiredRole) => {
+  return (req, res, next) => {
+    if (req.isAuthenticated) {
+      const user = req.user;
+      if (user?.role === requiredRole) {
+        return next();
+      } else {
+        res.render('error', 
+          { user: req.user,
+            message: 'Insufficient access permissions'});
+      }
+    } else {
+      res.redirect('/login'); 
+    }
+  }
+}
 
 app.use("/graphql", 
-  // ensureAuthenticated,
+  ensureAuthenticated,
   cors(),
   json(), 
   expressMiddleware(server, 
-    // {
-    // context: async ({ req, res }) => {
+    {
+    context: async ({ req, res }) => {
   
-    //     // Add the user to the context
-    //     return { user: req.user };
+        // Add the user to the context
+        return { user: req.user };
       
-    // }
-  // }
+    }
+  }
 ));
 
 
 //views
 
-app.get('/products', 
+app.get('/', (req, res) => {
+      console.log("User", req.user);
+  res.render('index', {user: req.user});  
+});
+
+app.get('/login', (req, res) => {
+    res.render('login');
+});
+ 
+
+app.get('/products', ensureAuthenticated,
   async (req, res) => {
 
     const result = await storeDB.allProducts()
     
 
     res.render('allProducts', 
-		{products: result.map(product => product.toJSON())});
+		{user: req.user, products: result.map(product => product.toJSON())});
   }
 );
 
-app.post('/products', 
+app.post('/products', ensureAuthenticated,
   async (req, res) => {
     //let's say we're abby for now
-    let customerId= "1"
+    let customerId= req.user
 
 
     let productId = req.body.productId
@@ -159,51 +201,51 @@ app.post('/products',
   }
 );
 
-app.get('/lookupByProductName', 
+app.get('/lookupByProductName', ensureAuthenticated,
   async (req, res) => {
 	if (req.query.pname) {
 		const result = await storeDB.lookupByProductName(req.query.pname)
 		res.render('productSearch', 
 			{query: req.query.pname, products: result.map(product => product.toJSON())});
 	} else {
-		res.render('productSearchForm');
+		res.render('productSearchForm', {user: req.user});
 	}
 });
 
-app.post('/lookupByProductName', 
+app.post('/lookupByProductName', ensureAuthenticated,
   async (req, res) => {
     let result = await storeDB.lookupByProductName(req.body.pname);
     res.render('productSearch', 
-      {query: req.body.pname, products: result.map(product => product.toJSON())});
+      {user: req.user, query: req.body.pname, products: result.map(product => product.toJSON())});
 });
 
 
-app.get('/lookupByProductName/:pname',
+app.get('/lookupByProductName/:pname', ensureAuthenticated,
   async (req, res) => {
     const result = await storeDB.lookupByProductName(req.params.pname)
 
     console.log(result)
     res.render('productSearch', 
-		{query: req.params.pname, products: result.map(product => product.toJSON())});
+		{user: req.user, query: req.params.pname, products: result.map(product => product.toJSON())});
 });
 
 
-app.get('/cart',
+app.get('/cart', ensureAuthenticated,
   async (req, res) => {
     //let's say we're abby for now
-    const result = await storeDB.getCart("1")
+    let customerId= req.user
+    const result = await storeDB.getCart(customerId)
 
     console.log(result)
     res.render('cart', 
-		{quantities: result.quantities.map(quantity => quantity.toJSON())});
+		{user: req.user, quantities: result.quantities.map(quantity => quantity.toJSON())});
 });
 
 
-app.post('/cart',
+app.post('/cart', ensureAuthenticated,
   async (req, res) => {
     //let's say we're abby for now
-    // let customerId=req.body.customerId
-    let customerId="1"
+    let customerId= req.user
 
     if (req.body.productId){
       let productId=req.body.productId
@@ -217,13 +259,14 @@ app.post('/cart',
     res.redirect('/cart');
 });
 
-app.get('/pastOrders',
+app.get('/pastOrders', ensureAuthenticated,
   async (req, res) => {
-    const result = await storeDB.getPastOrders("1")
+    let customerId =  req.user
+    const result = await storeDB.getPastOrders(customerId)
 
     
     res.render('pastOrders', 
-    {orders: result});
+    {user: req.user, orders: result});
 });
 
 //api
@@ -247,6 +290,11 @@ app.get('/api/products',
     res.json(result);
   }
 );
+
+// for debugging
+app.get('/session', (req, res) => {
+  res.json(req.session);
+});
 
 const PORT = 5555;
 
