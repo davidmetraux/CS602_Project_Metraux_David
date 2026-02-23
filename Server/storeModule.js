@@ -95,7 +95,8 @@ export const getCart =  async (customerId) => {
 }
 
 
-//maybe add to graphql, but might not like the lean bit. Kind of annoying.
+//maybe add to graphql, but might not like the lean bit. Kind of annoying. 
+// Couldn't figure out how to display from pastOrders with toJSON(), which is how I'd usually do it.
 export const getPastOrders =  async (customerId) => {
 	console.log("cart of user with id "+ customerId)
 
@@ -117,37 +118,41 @@ export const getPastOrders =  async (customerId) => {
 export const moveToCart = async (productId, customerId, quantity) => {
 	//PUT IN ERROR MESSAGING IF EITHER ID IS WORNG
 
-
-	let customer = await Customer.findById(customerId).populate({
-			path: 'orders',
-			match: { inCart: true },
-			populate: {
-				path: 'quantities',
+	
+		let customer = await Customer.findById(customerId).populate({
+				path: 'orders',
+				match: { inCart: true },
+				populate: {
+					path: 'quantities',
+				}
 			}
+		)
+	
+		let cart = customer.orders[0]
+
+		console.log("cart", cart)
+
+	if (quantity > 0){
+
+		let existingQuantity = cart.quantities.find((quantity)=>quantity.product==productId)
+		if (existingQuantity){
+
+			existingQuantity.quantity+=quantity
+			await existingQuantity.save()
+		} else{
+			let newQuantityId= new mongoose.Types.ObjectId().toString()
+
+			await Quantity.create({
+				_id: newQuantityId,
+				product: productId,
+				quantity: quantity,
+				orders:[cart._id],
+			})
+
+			cart.quantities.push(newQuantityId)
+			await cart.save()
+
 		}
-	)
-	let cart = customer.orders[0]
-
-	console.log("cart", cart)
-
-	let existingQuantity = cart.quantities.find((quantity)=>quantity.product==productId)
-	if (existingQuantity){
-
-		existingQuantity.quantity+=quantity
-		await existingQuantity.save()
-	} else{
-		let newQuantityId= new mongoose.Types.ObjectId().toString()
-
-		await Quantity.create({
-			_id: newQuantityId,
-			product: productId,
-			quantity: quantity,
-			orders:[cart._id],
-		})
-
-		cart.quantities.push(newQuantityId)
-		await cart.save()
-
 	}
 
 	return cart

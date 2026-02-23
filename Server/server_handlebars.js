@@ -139,6 +139,26 @@ app.get('/products',
   }
 );
 
+app.post('/products', 
+  async (req, res) => {
+    //let's say we're abby for now
+    let customerId= "1"
+
+
+    let productId = req.body.productId
+    let numberToAdd = req.body[productId.toString()+"input"]
+    console.log(req.body)
+    if (numberToAdd && parseInt(numberToAdd)){
+      const result = await storeDB.moveToCart(productId, customerId, parseInt(numberToAdd))
+      res.redirect('/cart');
+    } else {
+      res.redirect('back');
+    }
+    
+    
+  }
+);
+
 app.get('/lookupByProductName', 
   async (req, res) => {
 	if (req.query.pname) {
@@ -152,9 +172,9 @@ app.get('/lookupByProductName',
 
 app.post('/lookupByProductName', 
   async (req, res) => {
-	let result = await storeDB.lookupByProductName(req.body.pname);
-	res.render('productSearch', 
-		{query: req.body.pname, products: result.map(product => product.toJSON())});
+    let result = await storeDB.lookupByProductName(req.body.pname);
+    res.render('productSearch', 
+      {query: req.body.pname, products: result.map(product => product.toJSON())});
 });
 
 
@@ -200,6 +220,7 @@ app.post('/cart',
 app.get('/pastOrders',
   async (req, res) => {
     const result = await storeDB.getPastOrders("1")
+
     
     res.render('pastOrders', 
     {orders: result});

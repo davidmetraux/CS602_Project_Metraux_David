@@ -1,9 +1,11 @@
 <b>Product Name Query </b> {{query}}
 
+<form method="POST" action="/products">
 <ul>
     {{#each products}}
-        <li>{{this.name}} - {{this.description}} - <input><button>Add to Cart</button></li>
+        <li>{{this.name}} - {{this.description}} - <input name="{{this._id}}input"><button name="productId" value="{{this._id}}">Add to Cart</button></li>
     {{else}}
         No results
     {{/each}}
 </ul>
+</form>
