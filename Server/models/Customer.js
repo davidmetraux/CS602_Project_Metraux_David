@@ -7,7 +7,7 @@ const customerSchema = new Schema({
   name: String,
   role: String,
   password: String,
-  username: String,
+  username: {type:String, unique: true},
   orders: [{
     type: String,
     ref: "Order"
