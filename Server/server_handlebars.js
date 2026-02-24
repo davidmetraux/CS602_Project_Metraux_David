@@ -206,7 +206,7 @@ app.get('/lookupByProductName', ensureAuthenticated,
 	if (req.query.pname) {
 		const result = await storeDB.lookupByProductName(req.query.pname)
 		res.render('productSearch', 
-			{query: req.query.pname, products: result.map(product => product.toJSON())});
+			{user: req.user, query: req.query.pname, products: result.map(product => product.toJSON())});
 	} else {
 		res.render('productSearchForm', {user: req.user});
 	}
@@ -227,6 +227,35 @@ app.get('/lookupByProductName/:pname', ensureAuthenticated,
     console.log(result)
     res.render('productSearch', 
 		{user: req.user, query: req.params.pname, products: result.map(product => product.toJSON())});
+});
+
+
+app.get('/lookupByProductDescription', ensureAuthenticated,
+  async (req, res) => {
+	if (req.query.pdescription) {
+		const result = await storeDB.lookupByProductDescription(req.query.pdescription)
+		res.render('productDescriptionSearch', 
+			{user: req.user, query: req.query.pdescription, products: result.map(product => product.toJSON())});
+	} else {
+		res.render('productDescriptionSearchForm', {user: req.user});
+	}
+});
+
+app.post('/lookupByProductDescription', ensureAuthenticated,
+  async (req, res) => {
+    let result = await storeDB.lookupByProductDescription(req.body.pdescription);
+    res.render('productDescriptionSearch', 
+      {user: req.user, query: req.body.pdescription, products: result.map(product => product.toJSON())});
+});
+
+
+app.get('/lookupByProductDescription/:pdescription', ensureAuthenticated,
+  async (req, res) => {
+    const result = await storeDB.lookupByProductName(req.params.pdescription)
+
+    console.log(result)
+    res.render('productDescriptionSearch', 
+		{user: req.user, query: req.params.pdescription, products: result.map(product => product.toJSON())});
 });
 
 

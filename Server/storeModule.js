@@ -122,6 +122,23 @@ export const getAllCustomers =  async () => {
 	return result
 };
 
+//maybe add to graphql
+export const lookupByProductDescription = async (description) =>{
+		console.log("\nLookup by ProductName:", description);
+
+	description = description?.trim();
+  	if (!description)
+  		return [];
+	
+	let result = await Product.find({description: new RegExp(description, "i")});
+
+	if (result)
+		return result;
+	else
+		return [];
+
+}
+
 //mutations
 
 export const moveToCart = async (productId, customerId, quantity) => {
