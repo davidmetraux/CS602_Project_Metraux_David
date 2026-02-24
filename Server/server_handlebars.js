@@ -5,7 +5,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { GraphQLError } from 'graphql';
 
-import { validateUser, findUser } from './dbUsers.js';
+import { validateUser, findUser } from './dbInit.js';
 
 import * as storeDB 
     from './storeModule.js';

@@ -5,7 +5,32 @@ import { MongoClient, ServerApiVersion }
 
 import {dbURL}  from "./credentials.js";
 
-import {users} from "./dbUsers.js"
+export const users = [
+    {
+        _id: "1",
+        name:"Abby",
+        username: "abby",
+        password: "1234",
+        role:"user",
+        orders: ["1"]
+    },
+    {
+        _id:"2",
+        name: "Barry",
+        username: "barry",        
+        password: "2345",
+        role:"user",
+       orders: ["2"] 
+    },
+    {
+        _id:"3",
+        name: "Charlene",
+        username: "charlene",        
+        password: "3456",
+        role:"admin",
+        orders: ["3"] 
+    }
+]
 
 const client = new MongoClient(dbURL, {
   serverApi: {
@@ -40,6 +65,19 @@ result = await ordersCollection.insertMany(orderData);
 console.log('Inserted Ids:', result.insertedIds);
 
 //customers
+
+
+export function findUser (username) {
+  return users.find(user => 
+            user.username == username);
+}
+
+export async function  validateUser(name, password) {
+  return users.find(user => 
+            user.username == name && user.password == password);
+}
+
+
 const customerData = users
 console.log("Read", customerData.length, "customers");
 
