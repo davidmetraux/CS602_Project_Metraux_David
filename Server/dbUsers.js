@@ -1,5 +1,5 @@
 //pull from cs602_project_customers later
-const users = [
+export const users = [
     {
         _id: "1",
         name:"Abby",

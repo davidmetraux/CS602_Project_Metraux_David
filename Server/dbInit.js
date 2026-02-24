@@ -5,6 +5,8 @@ import { MongoClient, ServerApiVersion }
 
 import {dbURL}  from "./credentials.js";
 
+import {users} from "./dbUsers.js"
+
 const client = new MongoClient(dbURL, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -38,8 +40,7 @@ result = await ordersCollection.insertMany(orderData);
 console.log('Inserted Ids:', result.insertedIds);
 
 //customers
-const json3Data = fs.readFileSync('cs602_project_customers.json');
-const customerData = JSON.parse(json3Data);
+const customerData = users
 console.log("Read", customerData.length, "customers");
 
 const customerCollection = client.db("cs602_project").collection("customers");
