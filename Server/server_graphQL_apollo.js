@@ -51,6 +51,9 @@ export const typeDefs_Queries = `#graphql
     allProducts: [Product]!
     productsWithinRange(startInclusive: Float, endInclusive: Float): [Product]!
     getCart(id: String!): Order
+    getPastOrdersGraphQL(id: String!): [Order]!
+    getAllCustomers: [Customer]!
+    lookupByProductDescription(description: String!): [Product]!
   }
 `
 
@@ -125,8 +128,25 @@ export const resolvers_Queries = {
       console.log("get cart", args.id)
       const result = await storeDB.getCart(args.id)
       return result
-    }
+    },
 
+    getPastOrdersGraphQL: async (parent, args, context) => {
+      console.log("get past orders", args.id)
+      const result = await storeDB.getPastOrdersGraphQL(args.id)
+      return result
+    },
+
+    getAllCustomers: async (parent, args, context) => {
+      console.log("get all customers")
+      const result = await storeDB.getAllCustomers()
+      return result
+    },
+
+    lookupByProductDescription: async (parent, args, context) => {
+      console.log("lookup by product description", args.description)
+      const result = await storeDB.lookupByProductDescription(args.description)
+      return result
+    }
   },
 
 

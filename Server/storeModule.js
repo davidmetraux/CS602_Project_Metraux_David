@@ -95,9 +95,25 @@ export const getCart =  async (customerId) => {
 }
 
 
-//maybe add to graphql, but might not like the lean bit. Kind of annoying. 
+
 // Couldn't figure out how to display from pastOrders with toJSON(), which is how I'd usually do it.
 export const getPastOrders =  async (customerId) => {
+	console.log("cart of user with id "+ customerId)
+
+	let result =  await Order.find({
+			customer:customerId,
+			inCart:false
+		}).populate({
+			path: 'quantities',
+			populate: {
+				path: "product"
+			}
+		}).lean(true)
+
+	return result
+}
+
+export const getPastOrdersGraphQL =  async (customerId) => {
 	console.log("cart of user with id "+ customerId)
 
 	let result =  await Order.find({
@@ -145,40 +161,45 @@ export const moveToCart = async (productId, customerId, quantity) => {
 	//PUT IN ERROR MESSAGING IF EITHER ID IS WORNG
 
 	
-		let customer = await Customer.findById(customerId).populate({
-				path: 'orders',
-				match: { inCart: true },
-				populate: {
-					path: 'quantities',
-				}
+	let customer = await Customer.findById(customerId).populate({
+			path: 'orders',
+			match: { inCart: true },
+			populate: {
+				path: 'quantities',
 			}
-		)
+		}
+	)
 	
+	try {
 		let cart = customer.orders[0]
 
 		console.log("cart", cart)
 
-	if (quantity > 0){
+		
+		if (quantity > 0){
 
-		let existingQuantity = cart.quantities.find((quantity)=>quantity.product==productId)
-		if (existingQuantity){
+			let existingQuantity = cart.quantities.find((quantity)=>quantity.product==productId)
+			if (existingQuantity){
 
-			existingQuantity.quantity+=quantity
-			await existingQuantity.save()
-		} else{
-			let newQuantityId= new mongoose.Types.ObjectId().toString()
+				existingQuantity.quantity+=quantity
+				await existingQuantity.save()
+			} else{
+				let newQuantityId= new mongoose.Types.ObjectId().toString()
 
-			await Quantity.create({
-				_id: newQuantityId,
-				product: productId,
-				quantity: quantity,
-				orders:[cart._id],
-			})
+				await Quantity.create({
+					_id: newQuantityId,
+					product: productId,
+					quantity: quantity,
+					orders:[cart._id],
+				})
 
-			cart.quantities.push(newQuantityId)
-			await cart.save()
+				cart.quantities.push(newQuantityId)
+				await cart.save()
 
+			}
 		}
+	} catch (e) {
+		throw new Error("product or customer ID is wrong");
 	}
 
 	return cart
@@ -197,30 +218,34 @@ export const removeFromCart = async (customerId, productId) => {
 		}
 	)
 
-	let cart = customer.orders[0]
+	try {
+		let cart = customer.orders[0]
 
-	console.log("cart", cart)
+		console.log("cart", cart)
 
-	let quantity = cart.quantities.find((quantity)=>quantity.product==productId)
+		let quantity = cart.quantities.find((quantity)=>quantity.product==productId)
 
-	console.log("quantity to remove", quantity)
+		console.log("quantity to remove", quantity)
 
 
-	let index = cart.quantities.indexOf(quantity)
-	cart.quantities.splice(index, 1)
-	
-	console.log("cart after splicing", cart)
+		let index = cart.quantities.indexOf(quantity)
+		cart.quantities.splice(index, 1)
+		
+		console.log("cart after splicing", cart)
 
-	await cart.save()
+		await cart.save()
 
-	await Quantity.deleteOne({_id: quantity._id})
+		await Quantity.deleteOne({_id: quantity._id})
+	}
+	catch (e) {
+		throw new Error("product or customer ID is wrong");
+	}
 
 	return cart
 }
 
 export const submitOrder = async (customerId) => {
 
-//maybe remove customecart and just find the item
 	let customer = await Customer.findById(customerId).populate("orders");
 	let customerCart = await Customer.findById(customerId).populate({
 			path: 'orders',
@@ -233,41 +258,47 @@ export const submitOrder = async (customerId) => {
 			}
 		}
 	)
-	customerCart = customerCart.orders[0]
-	const quantities = customerCart.quantities
 
-	let quantity;
-	let product;
-	for (let i=0; i<quantities.length; i++){
-		quantity = quantities[i]
-		console.log("the quantity", quantity)
-		product = await quantity.product
-		console.log("the product", product)
-		if (product.quantity > quantity.quantity)
-			product.quantity = product.quantity - quantity.quantity
-		else {
-			quantity.quantity = product.quantity
-			product.quantity = 0
-			console.log("product quanity should be 0", product)
+	try {
+
+		customerCart = customerCart.orders[0]
+		const quantities = customerCart.quantities
+
+		let quantity;
+		let product;
+		for (let i=0; i<quantities.length; i++){
+			quantity = quantities[i]
+			console.log("the quantity", quantity)
+			product = await quantity.product
+			console.log("the product", product)
+			if (product.quantity > quantity.quantity)
+				product.quantity = product.quantity - quantity.quantity
+			else {
+				quantity.quantity = product.quantity
+				product.quantity = 0
+				console.log("product quanity should be 0", product)
+			}
+			quantity.save()
+			product.save()
 		}
-		quantity.save()
-		product.save()
+
+		customerCart.inCart=false
+		await customerCart.save()
+
+		let newOrderId= new mongoose.Types.ObjectId().toString()
+
+		let newCart = await Order.create({
+			_id: newOrderId,
+			customer: customerId,
+			quantities: [],
+			inCart: true
+		})
+
+		customer.orders.push(newOrderId)
+		await customer.save()
+	} catch (e) {
+		throw new Error("Customer ID is wrong");
 	}
-
-	customerCart.inCart=false
-	await customerCart.save()
-
-	let newOrderId= new mongoose.Types.ObjectId().toString()
-
-	let newCart = await Order.create({
-		_id: newOrderId,
-		customer: customerId,
-		quantities: [],
-		inCart: true
-	})
-
-	customer.orders.push(newOrderId)
-	await customer.save()
 
 	return newCart
 }
