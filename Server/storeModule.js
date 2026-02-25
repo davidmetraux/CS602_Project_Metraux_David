@@ -170,8 +170,10 @@ export const moveToCart = async (productId, customerId, quantity) => {
 		}
 	)
 	
+	let cart
+
 	try {
-		let cart = customer.orders[0]
+		 cart = customer.orders[0]
 
 		console.log("cart", cart)
 
@@ -218,8 +220,9 @@ export const removeFromCart = async (customerId, productId) => {
 		}
 	)
 
+	let cart;
 	try {
-		let cart = customer.orders[0]
+		cart = customer.orders[0]
 
 		console.log("cart", cart)
 
@@ -259,6 +262,8 @@ export const submitOrder = async (customerId) => {
 		}
 	)
 
+	let newCart
+
 	try {
 
 		customerCart = customerCart.orders[0]
@@ -287,7 +292,7 @@ export const submitOrder = async (customerId) => {
 
 		let newOrderId= new mongoose.Types.ObjectId().toString()
 
-		let newCart = await Order.create({
+		newCart = await Order.create({
 			_id: newOrderId,
 			customer: customerId,
 			quantities: [],
