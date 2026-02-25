@@ -251,7 +251,7 @@ app.post('/lookupByProductDescription', ensureAuthenticated,
 
 app.get('/lookupByProductDescription/:pdescription', ensureAuthenticated,
   async (req, res) => {
-    const result = await storeDB.lookupByProductName(req.params.pdescription)
+    const result = await storeDB.lookupByProductDescription(req.params.pdescription)
 
     console.log(result)
     res.render('productDescriptionSearch', 
